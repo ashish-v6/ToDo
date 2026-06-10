@@ -2,18 +2,18 @@ import { useState } from "react";
 import { v4 as uuidv4, v4 } from 'uuid';
 
 export default function ToDo() {
-    let [todos, setTodos] = useState([{task : "Your Tasks", id : v4()}]);
+    let [todos, setTodos] = useState([{task : "Your Tasks", id : v4(), isDone : false}]);
     let [newTask, setNewTask ] = useState("");
 
     let onChangeHandler = (event) =>{
         setNewTask(event.target.value);
     }
     let addHandler = (event) =>{
-        setTodos((prevTodos) =>{
+        setTodos(() =>{
             if(!newTask){
-                return [...prevTodos];
+                return [...todos];
             }
-            return [...prevTodos, {task : newTask, id : v4()}]
+            return [...todos, {task : newTask, id : v4(), isDone : false}]
         })
     }
     let deleteHandler = (id) =>{
@@ -37,11 +37,39 @@ export default function ToDo() {
                 if(ele.id === id){
                     return {
                         id : ele.id,
-                        task : ele.task.toUpperCase()
+                        task : ele.task.toUpperCase(),
+                        isDone : true
                     }
                 }
                 else{
                     return ele;
+                }
+            })
+        })
+    }
+    let doneHandler = (id) =>{
+        setTodos(() =>{
+            return todos.map((ele) =>{
+                if(ele.id === id){
+                    return{
+                        ...ele,
+                        isDone : true
+                    }
+                }
+                else{
+                    return{
+                        ...ele
+                    }
+                }
+            })
+        })
+    }
+    let doneAllHandler = () =>{
+        setTodos(()=>{
+            return todos.map((ele)=>{
+                return{
+                    ...ele,
+                    isDone : true
                 }
             })
         })
@@ -58,14 +86,18 @@ export default function ToDo() {
              &nbsp;
             {todos.map((ele) =>{
                 return <li key={ele.id}>
-                    <span>{ele.task}</span>
+                    <span style={ele.isDone ? {textDecorationLine : "line-through"} : {}}>{ele.task}</span>
                     &nbsp;&nbsp;
                     <button className="counter" onClick={() => deleteHandler(ele.id)}>Delete</button>
                     &nbsp;&nbsp;
                     <button className="counter" onClick={() => updateOneHandler(ele.id)}>UpdateCase</button>
+                    &nbsp;&nbsp;
+                    <button className="counter" onClick={() => doneHandler(ele.id)}>Done</button>
                     </li>
             })}
             <button className="counter" onClick={updateAllHandler}>UpperCase All!</button>
+            &nbsp;&nbsp;
+            <button className="counter" onClick={doneAllHandler}>Done All!</button>
         </div>
     )
 }
